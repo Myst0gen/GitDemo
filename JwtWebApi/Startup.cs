@@ -1,4 +1,5 @@
 using JwtWebApi.Data;
+using JwtWebApi.Handlers;
 using JwtWebApi.Models;
 using JwtWebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,23 +42,26 @@ namespace JwtWebApi
 
             //JWT Authentication
             var appSettings = appSettingsSection.Get<AppSettings>();
-            var key = Encoding.ASCII.GetBytes(appSettings.Key);
+            var key = Encoding.UTF8.GetBytes(appSettings.Key);
 
-            services.AddAuthentication(auth =>
-            {
-                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(bearer=> {
-                bearer.RequireHttpsMetadata = false;
-                bearer.SaveToken = false;
-                bearer.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false    
-                };
-            });
+            //services.AddAuthentication(auth =>
+            //{
+            //    auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //}).AddJwtBearer(bearer=> {
+            //    bearer.RequireHttpsMetadata = false;
+            //    bearer.SaveToken = false;
+            //    bearer.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuerSigningKey = true,
+            //        IssuerSigningKey = new SymmetricSecurityKey(key),
+            //        ValidateIssuer = false,
+            //        ValidateAudience = false    
+            //    };
+            //});
+
+            services.AddAuthentication("Basic").AddScheme<BasicAuthenticationOptions, JwtCustomAuthHandler>("Basic", null);
+
             services.AddSingleton<IAuthenticateService, AuthenticateService>();
         }
 
@@ -87,8 +91,8 @@ namespace JwtWebApi
             app.UseRouting();
 
             app.UseAuthentication();
+            
             app.UseAuthorization();
-           
 
             app.UseEndpoints(endpoints =>
             {

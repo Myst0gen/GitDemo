@@ -23,12 +23,20 @@ namespace JwtWebApi.Services
             new Users
             {
                 UserName = "Akshay",
-                Password = "Admin"
+                Password = "Admin",
+                UserRole = "1"
+            },
+            new Users
+            {
+                UserName = "Rajesh",
+                Password = "User",
+                UserRole = "2"
             }
         };
         public string GenerateToken(Users users)
         {
             var details = lst.SingleOrDefault(x => x.UserName == users.UserName && x.Password == users.Password);
+            var Urls = 
             if (details == null)
                 return null;
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -36,13 +44,14 @@ namespace JwtWebApi.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[] {
-                    new Claim(ClaimTypes.Name, users.UserName.ToString()),
-                    new Claim("Password", users.Password.ToString())
+                    new Claim(ClaimTypes.Name, details.UserName.ToString()),
+                    new Claim("Password", details.Password.ToString()),
+                    new Claim(ClaimTypes.Role, details.UserRole.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddDays(2),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                Expires = DateTime.Now.AddDays(2),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
     }

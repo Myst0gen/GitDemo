@@ -12,6 +12,7 @@ namespace JwtWebApi.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    //[ClaimsValidator("Manage Users")]
     public class HomeController : ControllerBase
     {
         private readonly IAuthenticateService _Authservice;
