@@ -21,7 +21,9 @@ jobs:
     
     - name: Restore
       shell: cmd
-      run: dotnet restore ${GITHUB_WORKSPACE}\GitDemo\GitDemo.sln
+      run: |
+        echo "repository variable : ${{ GITHUB_WORKSPACE }}" 
+    # run: dotnet restore ${GITHUB_WORKSPACE}\GitDemo\GitDemo.sln
     # - name: Build
     #   shell: cmd
     #   run:  dotnet build E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln --no-restore -c Release
