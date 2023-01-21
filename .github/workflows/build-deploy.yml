@@ -1,0 +1,122 @@
+name: "WorkFlows Demo"
+
+on: 
+  push:
+    branches: [ master ]
+
+env:  
+  NetCore_Version:  '5.0.x'
+
+jobs:
+  build:
+    name: build and Deploy
+    runs-on: MX-Self-Hosted
+    # runs-on: windows-2019
+    steps:
+    # - uses: actions/checkout@v1
+    # # - name: Setup Dotnet SDK
+    # #   uses: actions/setup-dotnet@v1
+    # #   with:
+    # #     dotnet-version: ${{ env.NetCore_Version }}
+    
+    - name: Restore
+      shell: cmd
+      run: dotnet restore E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln
+    - name: Build
+      shell: cmd
+      run:  dotnet build E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln --no-restore -c Release
+   
+    - name: Delete current publish files
+      shell: cmd
+      run:  del /s /q E:\Akshay\Projects\Publish\*.*
+
+    - name: Publish
+      shell: cmd 
+      run:  dotnet publish E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln --no-build -c Release -o E:\Akshay\Projects\Publish
+
+    - name: publish artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: pub
+        path: | 
+          E:/Akshay/Projects/publish
+          !E:/Akshay/Projects/publish/appsettings.json
+          !E:/Akshay/Projects/publish/appsettings.Development
+
+    - name: Add PowerShell File 
+      uses: actions/upload-artifact@v3
+      with:
+        name: pubPwsh
+        path: | 
+          E:/Akshay/Projects/main.ps1
+
+  deploy:
+    needs:  [build]
+    runs-on: EC2Runner
+    steps:
+      - name: Delete current publish files
+        shell: cmd
+        run:  del /s /q C:\inetpub\GitFiles\publish\*.*
+        
+      - name: 
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: pub
+          path: C:/inetpub/GitFiles/publish
+
+      - name: Delete Existing Artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: pub
+
+      - name: 
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: pubPwsh
+          path: C:/inetpub/GitFiles/publish
+
+      - name: Deletes Existing Artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: pubPwsh  
+
+      - name: Builds
+        run: |
+          powershell -noexit "& ""C:\inetpub\GitFiles\publish\main.ps1""" 
+
+
+
+      # - name: FTP Deploy
+      #   uses: sebastianpopp/ftp-action@v2.0.0
+      #   with:
+      #     # ftp server
+      #     host: ${{ secrets.UAT_IP }}
+      #     # ftp username
+      #     user: ${{ secrets.USERNAME }}
+      #     # ftp password
+      #     password: ${{ secrets.PASSWORD }}
+      #     # Folder to upload from, must end with trailing slash /
+      #     localDir: E:/Akshay/Projects/publishDemo/
+      #     # Path to upload to on the server. Must end with trailing slash /
+      #     remoteDir: C:/inetpub/wwwroot/
+
+    # - name: copy file via ssh password
+    #   uses: appleboy/scp-action@master
+    #   with:
+    #     host: ${{ secrets.UAT_IP}}
+    #     username: ${{ secrets.USERNAME }}
+    #     password: ${{ secrets.PASSWORD }}
+    #     port: 22
+    #     source: "./published/*"
+    #     target: E:\Akshay\Projects\Publish
+
+    # - name: IIS Deploy
+    #   run: |
+    #     Stop-IISSite -Name "Default Web Site"
+  
+    # - name: Publish Artifact
+    #   uses: actions/upload-artifact@v1.0.0
+    #   with: 
+    #     name: webapp
+    #     path: ./published    
+    
