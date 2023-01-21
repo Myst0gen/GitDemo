@@ -10,79 +10,79 @@ env:
 jobs:
   build:
     name: build and Deploy
-    runs-on: MX-Self-Hosted
+    runs-on: MX_SelfHosted
     # runs-on: windows-2019
     steps:
-    # - uses: actions/checkout@v1
+     - uses: actions/checkout@v1
     # # - name: Setup Dotnet SDK
     # #   uses: actions/setup-dotnet@v1
     # #   with:
     # #     dotnet-version: ${{ env.NetCore_Version }}
     
-    - name: Restore
-      shell: cmd
-      run: dotnet restore E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln
-    - name: Build
-      shell: cmd
-      run:  dotnet build E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln --no-restore -c Release
+  #   - name: Restore
+  #     shell: cmd
+  #     run: dotnet restore E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln
+  #   - name: Build
+  #     shell: cmd
+  #     run:  dotnet build E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln --no-restore -c Release
    
-    - name: Delete current publish files
-      shell: cmd
-      run:  del /s /q E:\Akshay\Projects\Publish\*.*
+  #   - name: Delete current publish files
+  #     shell: cmd
+  #     run:  del /s /q E:\Akshay\Projects\Publish\*.*
 
-    - name: Publish
-      shell: cmd 
-      run:  dotnet publish E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln --no-build -c Release -o E:\Akshay\Projects\Publish
+  #   - name: Publish
+  #     shell: cmd 
+  #     run:  dotnet publish E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln --no-build -c Release -o E:\Akshay\Projects\Publish
 
-    - name: publish artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: pub
-        path: | 
-          E:/Akshay/Projects/publish
-          !E:/Akshay/Projects/publish/appsettings.json
-          !E:/Akshay/Projects/publish/appsettings.Development
+  #   - name: publish artifacts
+  #     uses: actions/upload-artifact@v3
+  #     with:
+  #       name: pub
+  #       path: | 
+  #         E:/Akshay/Projects/publish
+  #         !E:/Akshay/Projects/publish/appsettings.json
+  #         !E:/Akshay/Projects/publish/appsettings.Development
 
-    - name: Add PowerShell File 
-      uses: actions/upload-artifact@v3
-      with:
-        name: pubPwsh
-        path: | 
-          E:/Akshay/Projects/main.ps1
+  #   - name: Add PowerShell File 
+  #     uses: actions/upload-artifact@v3
+  #     with:
+  #       name: pubPwsh
+  #       path: | 
+  #         E:/Akshay/Projects/main.ps1
 
-  deploy:
-    needs:  [build]
-    runs-on: EC2Runner
-    steps:
-      - name: Delete current publish files
-        shell: cmd
-        run:  del /s /q C:\inetpub\GitFiles\publish\*.*
+  # deploy:
+  #   needs:  [build]
+  #   runs-on: RS_Home
+  #   steps:
+  #     - name: Delete current publish files
+  #       shell: cmd
+  #       run:  del /s /q C:\inetpub\GitFiles\publish\*.*
         
-      - name: 
-        uses: actions/download-artifact@v3.0.0
-        with:
-          name: pub
-          path: C:/inetpub/GitFiles/publish
+  #     - name: 
+  #       uses: actions/download-artifact@v3.0.0
+  #       with:
+  #         name: pub
+  #         path: C:/inetpub/GitFiles/publish
 
-      - name: Delete Existing Artifact
-        uses: geekyeggo/delete-artifact@v1
-        with:
-          name: pub
+  #     - name: Delete Existing Artifact
+  #       uses: geekyeggo/delete-artifact@v1
+  #       with:
+  #         name: pub
 
-      - name: 
-        uses: actions/download-artifact@v3.0.0
-        with:
-          name: pubPwsh
-          path: C:/inetpub/GitFiles/publish
+  #     - name: 
+  #       uses: actions/download-artifact@v3.0.0
+  #       with:
+  #         name: pubPwsh
+  #         path: C:/inetpub/GitFiles/publish
 
-      - name: Deletes Existing Artifact
-        uses: geekyeggo/delete-artifact@v1
-        with:
-          name: pubPwsh  
+  #     - name: Deletes Existing Artifact
+  #       uses: geekyeggo/delete-artifact@v1
+  #       with:
+  #         name: pubPwsh  
 
-      - name: Builds
-        run: |
-          powershell -noexit "& ""C:\inetpub\GitFiles\publish\main.ps1""" 
+  #     - name: Builds
+  #       run: |
+  #         powershell -noexit "& ""C:\inetpub\GitFiles\publish\main.ps1""" 
 
 
 
