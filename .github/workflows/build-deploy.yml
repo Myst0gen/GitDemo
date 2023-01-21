@@ -13,10 +13,11 @@ jobs:
     runs-on: MX_SelfHosted
     # runs-on: windows-2019
     steps:
-     - uses: actions/checkout@v1
+     - uses: actions/checkout@v3.3.0
     # # - name: Setup Dotnet SDK
     # #   uses: actions/setup-dotnet@v1
-    # #   with:
+       with:
+            Myst0gen/GitDemo
     # #     dotnet-version: ${{ env.NetCore_Version }}
     
   #   - name: Restore
