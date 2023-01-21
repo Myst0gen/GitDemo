@@ -36,7 +36,7 @@ namespace JwtWebApi.Services
         public string GenerateToken(Users users)
         {
             var details = lst.SingleOrDefault(x => x.UserName == users.UserName && x.Password == users.Password);
-            var Urls = 
+            //var Urls = 
             if (details == null)
                 return null;
             var tokenHandler = new JwtSecurityTokenHandler();
