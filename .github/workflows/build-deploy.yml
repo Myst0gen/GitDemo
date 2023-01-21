@@ -21,12 +21,10 @@ jobs:
     
     - name: Restore
       shell: cmd
-      run: |
-        echo "repository variable : ${{ GITHUB_WORKSPACE }}" 
-    # run: dotnet restore ${GITHUB_WORKSPACE}\GitDemo\GitDemo.sln
-    # - name: Build
-    #   shell: cmd
-    #   run:  dotnet build E:\Akshay\Projects\gitWorkflowDemo\gitWorkflowDemo.sln --no-restore -c Release
+      run: dotnet restore E:\actions-runner\_work\GitDemo\GitDemo\GitDemo.sln
+    - name: Build
+      shell: cmd
+      run:  dotnet build E:\actions-runner\_work\GitDemo\GitDemo\gitWorkflowDemo.sln --no-restore -c Release
    
   #   - name: Delete current publish files
   #     shell: cmd
